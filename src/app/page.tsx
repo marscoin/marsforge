@@ -209,15 +209,28 @@ export default function Home() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Hero */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          <span className="bg-gradient-to-r from-[#e77d11] via-[#ff6b35] to-[#c1440e] bg-clip-text text-transparent">
-            MarsForge
-          </span>
-        </h1>
-        <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-          Forging the future on the Red Planet. Mine Marscoin to support the Martian Republic.
-        </p>
+      <div className="relative rounded-2xl overflow-hidden mb-12">
+        <div className="absolute inset-0">
+          <img src="/images/hero-forge.webp" alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a2e]/90 via-[#1a1a2e]/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-transparent to-transparent" />
+        </div>
+        <div className="relative px-6 py-16 md:py-20 max-w-2xl">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <span className="bg-gradient-to-r from-[#e77d11] via-[#ff6b35] to-[#c1440e] bg-clip-text text-transparent">
+              MarsForge
+            </span>
+          </h1>
+          <p className="text-lg md:text-xl text-gray-300 mb-6">
+            Forging the future on the Red Planet. Mine Marscoin to support the Martian Republic.
+          </p>
+          <div className="flex gap-3">
+            <a href="/start" className="btn-primary">Start Mining</a>
+            <a href="/pool" className="px-4 py-2 border border-[#2d3a5c] text-[#e77d11] rounded-lg hover:bg-[#1e2746] text-sm">
+              Pool Stats
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* Stats Grid - two rows of 4 */}

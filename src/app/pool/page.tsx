@@ -80,13 +80,19 @@ export default function PoolPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">
-          <span className="bg-gradient-to-r from-[#e77d11] to-[#c1440e] bg-clip-text text-transparent">
-            Pool Statistics
-          </span>
-        </h1>
-        <p className="text-gray-400">Real-time Marscoin mining pool data</p>
+      <div className="relative rounded-2xl overflow-hidden mb-8">
+        <div className="absolute inset-0">
+          <img src="/images/pool-forge.webp" alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a2e]/90 via-[#1a1a2e]/70 to-[#1a1a2e]/50" />
+        </div>
+        <div className="relative px-6 py-10">
+          <h1 className="text-3xl font-bold mb-2">
+            <span className="bg-gradient-to-r from-[#e77d11] to-[#c1440e] bg-clip-text text-transparent">
+              Pool Statistics
+            </span>
+          </h1>
+          <p className="text-gray-300">Real-time Marscoin mining pool data</p>
+        </div>
       </div>
 
       {/* Overview Stats */}

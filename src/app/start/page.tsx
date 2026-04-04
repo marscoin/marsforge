@@ -147,15 +147,21 @@ export default function StartPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">
-          <span className="bg-gradient-to-r from-[#e77d11] to-[#c1440e] bg-clip-text text-transparent">
-            Start Mining Marscoin
-          </span>
-        </h1>
-        <p className="text-gray-400 max-w-xl mx-auto">
-          Join the Martian Republic by mining MARS. Follow these steps to get started in minutes.
-        </p>
+      <div className="relative rounded-2xl overflow-hidden mb-12">
+        <div className="absolute inset-0">
+          <img src="/images/start-forge.webp" alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e] via-[#1a1a2e]/80 to-[#1a1a2e]/40" />
+        </div>
+        <div className="relative text-center px-6 py-14">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            <span className="bg-gradient-to-r from-[#e77d11] to-[#c1440e] bg-clip-text text-transparent">
+              Start Mining Marscoin
+            </span>
+          </h1>
+          <p className="text-gray-300 max-w-xl mx-auto">
+            Join the Martian Republic by mining MARS. Follow these steps to get started in minutes.
+          </p>
+        </div>
       </div>
 
       <div className="space-y-6">
