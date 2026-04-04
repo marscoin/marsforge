@@ -2,9 +2,11 @@
 
 **A modern, open-source mining pool frontend for [Marscoin](https://marscoin.org)**
 
+![MarsForge Dashboard](public/images/screenshot.jpg)
+
 MarsForge is a Next.js dashboard that sits on top of a [YIIMP](https://github.com/tpruvot/yiimp) mining pool backend. It provides real-time pool statistics, a block explorer, miner listings, and a getting-started guide -- all reading from the existing YIIMP MySQL database without modifying it.
 
-**Live:** [forge.mining-mars.com](https://forge.mining-mars.com)
+**Live:** [mining-mars.com](https://mining-mars.com)
 
 ![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
