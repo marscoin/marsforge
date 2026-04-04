@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Mars color palette */
+  --mars-red: #c1440e;
+  --mars-orange: #e77d11;
+  --mars-rust: #9e2a2b;
+  --mars-dark: #1a1a2e;
+  --mars-surface: #16213e;
+  --mars-light: #f4e3d7;
+  --mars-accent: #ff6b35;
+  --mars-dust: #d4a574;
+}
+
+body {
+  background: linear-gradient(135deg, var(--mars-dark) 0%, var(--mars-surface) 100%);
+  color: var(--mars-light);
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--mars-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--mars-rust);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mars-orange);
+}
+
+@layer components {
+  /* Card styles */
+  .card {
+    @apply bg-[#1e2746] border border-[#2d3a5c] rounded-lg shadow-lg;
+  }
+
+  .card-header {
+    @apply px-4 py-3 border-b border-[#2d3a5c] font-semibold text-[#e77d11];
+  }
+
+  .card-body {
+    @apply p-4;
+  }
+
+  /* Stats highlight */
+  .stat-value {
+    @apply text-2xl font-bold text-[#ff6b35];
+  }
+
+  .stat-label {
+    @apply text-sm text-gray-400;
+  }
+
+  /* Table styles */
+  .data-table {
+    @apply w-full text-sm;
+  }
+
+  .data-table th {
+    @apply px-4 py-2 text-left text-[#e77d11] border-b border-[#2d3a5c] bg-[#1a1a2e];
+  }
+
+  .data-table td {
+    @apply px-4 py-2 border-b border-[#2d3a5c];
+  }
+
+  .data-table tr:hover {
+    @apply bg-[#252f4a];
+  }
+
+  /* Button styles */
+  .btn-primary {
+    @apply px-4 py-2 bg-gradient-to-r from-[#e77d11] to-[#c1440e] text-white rounded-lg font-medium;
+    @apply hover:from-[#ff6b35] hover:to-[#e77d11] transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-[#2d3a5c] text-[#f4e3d7] rounded-lg font-medium;
+    @apply hover:bg-[#3d4a6c] transition-all duration-200;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full px-4 py-2 bg-[#1a1a2e] border border-[#2d3a5c] rounded-lg;
+    @apply text-[#f4e3d7] placeholder-gray-500;
+    @apply focus:outline-none focus:border-[#e77d11] focus:ring-1 focus:ring-[#e77d11];
+  }
+
+  /* Status badges */
+  .badge-online {
+    @apply px-2 py-1 bg-green-900/50 text-green-400 rounded text-xs font-medium;
+  }
+
+  .badge-offline {
+    @apply px-2 py-1 bg-red-900/50 text-red-400 rounded text-xs font-medium;
+  }
+
+  .badge-pending {
+    @apply px-2 py-1 bg-yellow-900/50 text-yellow-400 rounded text-xs font-medium;
+  }
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(231, 125, 17, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(231, 125, 17, 0.8);
+  }
+}
+
+.glow {
+  animation: pulse-glow 2s infinite;
+}
