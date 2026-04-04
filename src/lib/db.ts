@@ -47,7 +47,17 @@ export async function getPoolStats() {
     SELECT time FROM blocks ORDER BY time DESC LIMIT 1
   `);
 
-  return { coins, hashstats, workers, blockCount, lastBlock };
+  // Share stats for last hour
+  const [shareStats] = await pool.execute(`
+    SELECT
+      COUNT(*) as total,
+      SUM(CASE WHEN valid = 1 THEN 1 ELSE 0 END) as accepted,
+      SUM(CASE WHEN valid = 0 THEN 1 ELSE 0 END) as rejected
+    FROM shares
+    WHERE time > UNIX_TIMESTAMP() - 3600
+  `);
+
+  return { coins, hashstats, workers, blockCount, lastBlock, shareStats };
 }
 
 // Get blocks with pagination
@@ -186,6 +196,20 @@ export async function getWalletBalance(wallet: string) {
     WHERE a.username = ?
   `, [wallet]);
   return balance;
+}
+
+// Share statistics
+export async function getShareStats(hours = 24) {
+  const [result] = await pool.execute(`
+    SELECT
+      COUNT(*) as total,
+      SUM(CASE WHEN valid = 1 THEN 1 ELSE 0 END) as accepted,
+      SUM(CASE WHEN valid = 0 THEN 1 ELSE 0 END) as rejected,
+      SUM(CASE WHEN error > 0 THEN 1 ELSE 0 END) as errors
+    FROM shares
+    WHERE time > UNIX_TIMESTAMP() - ? * 3600
+  `, [hours]);
+  return (result as Array<Record<string, number>>)[0] || { total: 0, accepted: 0, rejected: 0, errors: 0 };
 }
 
 // Network hashrate history (derived from difficulty in hashrate table)

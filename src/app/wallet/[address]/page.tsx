@@ -158,38 +158,55 @@ export default function WalletPage() {
                 No workers found. Start mining to see your workers here.
               </div>
             ) : (
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Difficulty</th>
-                    <th>Algo</th>
-                    <th>Last Seen</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {workers.map((w: Worker) => {
-                    const age = Date.now() / 1000 - w.time;
-                    const isActive = age < 600;
-                    return (
-                      <tr key={w.id} className={isActive ? '' : 'opacity-50'}>
-                        <td className="font-mono text-sm text-[#f4e3d7]">
+              <div className="space-y-3 p-4">
+                {workers.map((w: Worker) => {
+                  const age = Date.now() / 1000 - w.time;
+                  const isActive = age < 600;
+                  const uptime = w.time ? Math.floor((Date.now() / 1000 - w.time)) : 0;
+                  return (
+                    <div key={w.id} className={`bg-[#1a1a2e] rounded-lg p-3 border border-[#2d3a5c] ${isActive ? '' : 'opacity-50'}`}>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-mono text-sm text-[#f4e3d7] font-semibold">
                           {w.name?.split('.')[1] || w.name || '—'}
-                        </td>
-                        <td className="text-gray-400">{w.difficulty?.toLocaleString()}</td>
-                        <td className="text-gray-400">{w.algo}</td>
-                        <td className="text-gray-400">{timeAgo(w.time)}</td>
-                        <td>
-                          <span className={isActive ? 'badge-online' : 'px-2 py-0.5 rounded text-xs border bg-gray-900/50 text-gray-400 border-gray-700'}>
-                            {isActive ? 'Online' : 'Offline'}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                        </span>
+                        <span className={isActive ? 'badge-online' : 'px-2 py-0.5 rounded text-xs border bg-gray-900/50 text-gray-400 border-gray-700'}>
+                          {isActive ? 'Online' : 'Offline'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Difficulty</span>
+                          <span className="text-gray-300">{w.difficulty?.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Algorithm</span>
+                          <span className="text-gray-300">{w.algo}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Last Share</span>
+                          <span className="text-gray-300">{timeAgo(w.time)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Software</span>
+                          <span className="text-gray-300 truncate max-w-[120px]">{w.version || '—'}</span>
+                        </div>
+                        {w.ip && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">IP</span>
+                            <span className="text-gray-300 font-mono">{w.ip}</span>
+                          </div>
+                        )}
+                        {isActive && uptime > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Connected</span>
+                            <span className="text-gray-300">{timeAgo(w.time)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         </div>

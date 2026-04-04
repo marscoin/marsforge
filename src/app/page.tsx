@@ -176,10 +176,26 @@ export default function Home() {
   const workers = Array.isArray(stats.workers) && stats.workers[0] ? Number(stats.workers[0].count) : 0;
   const difficulty = coin?.difficulty || 0;
   const blockTime = coin?.block_time || 120;
+  const reward = coin?.reward || 0.195;
+
+  // Shares
+  const shares = Array.isArray(stats.shareStats) && stats.shareStats[0] ? stats.shareStats[0] : null;
+  const accepted = Number(shares?.accepted || 0);
+  const rejected = Number(shares?.rejected || 0);
+  const rejectRate = accepted + rejected > 0 ? (rejected / (accepted + rejected)) * 100 : 0;
 
   // Network hashrate = difficulty * 2^32 / block_time
   const networkHashrate = difficulty > 0 ? (difficulty * Math.pow(2, 32)) / blockTime : 0;
   const poolShare = networkHashrate > 0 ? (hashrate / networkHashrate) * 100 : 0;
+
+  // Estimated time to block (seconds)
+  const etbSeconds = poolShare > 0 ? blockTime / (poolShare / 100) : 0;
+  const formatEtb = (s: number) => {
+    if (s <= 0) return '—';
+    if (s < 3600) return `${Math.round(s / 60)}m`;
+    if (s < 86400) return `${(s / 3600).toFixed(1)}h`;
+    return `${(s / 86400).toFixed(1)}d`;
+  };
 
   // Format hashrate
   const formatHashrate = (h: number) => {
@@ -204,41 +220,52 @@ export default function Home() {
         </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+      {/* Stats Grid - two rows of 4 */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <StatCard
           title="Pool Hashrate"
           value={formatHashrate(hashrate)}
-          subtitle={poolShare > 0 ? `${poolShare.toFixed(2)}% of network` : 'Combined mining power'}
+          subtitle={poolShare > 0 ? `${poolShare.toFixed(2)}% of network` : '—'}
         />
         <StatCard
           title="Network Hashrate"
           value={formatHashrate(networkHashrate)}
-          subtitle="Estimated from difficulty"
+          subtitle={`Difficulty: ${difficulty ? (difficulty/1000).toFixed(0) + 'K' : '—'}`}
         />
         <StatCard
           title="Active Workers"
           value={workers.toString()}
-          subtitle="Mining devices"
+          subtitle="Connected miners"
         />
         <StatCard
-          title="Difficulty"
-          value={difficulty ? `${(difficulty/1000).toFixed(1)}K` : '—'}
-          subtitle="Network difficulty"
+          title="Est. Time to Block"
+          value={formatEtb(etbSeconds)}
+          subtitle="At current pool hashrate"
         />
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard
           title="Block Reward"
-          value={coin?.reward ? `${coin.reward} MARS` : '0.195 MARS'}
-          subtitle="Per block found"
+          value={`${reward} MARS`}
+          subtitle={usdPrice > 0 ? `~$${(reward * usdPrice).toFixed(4)}` : ''}
         />
-        {usdPrice > 0 && (
-          <StatCard
-            title="MARS Price"
-            value={`$${usdPrice.toFixed(4)}`}
-            subtitle={`${change24h >= 0 ? '+' : ''}${change24h.toFixed(2)}% (24h)`}
-            trend={change24h >= 0 ? 'up' : 'down'}
-          />
-        )}
+        <StatCard
+          title="MARS Price"
+          value={usdPrice > 0 ? `$${usdPrice.toFixed(4)}` : '—'}
+          subtitle={usdPrice > 0 ? `${change24h >= 0 ? '+' : ''}${change24h.toFixed(2)}% (24h)` : ''}
+          trend={usdPrice > 0 ? (change24h >= 0 ? 'up' : 'down') : undefined}
+        />
+        <StatCard
+          title="Shares (1h)"
+          value={accepted.toLocaleString()}
+          subtitle={`${rejectRate.toFixed(1)}% rejected`}
+          trend={rejectRate > 5 ? 'down' : rejectRate > 0 ? 'neutral' : 'up'}
+        />
+        <StatCard
+          title="Block Height"
+          value={coin?.block_height ? coin.block_height.toLocaleString() : '—'}
+          subtitle={`${coin?.connections || 0} peers connected`}
+        />
       </div>
 
       {/* Main Content Grid */}
