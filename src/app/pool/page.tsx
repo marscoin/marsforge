@@ -1,6 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
+import HashrateChart from '@/components/HashrateChart';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -11,11 +12,6 @@ function formatHashrate(h: number) {
   if (h >= 1e6) return `${(h / 1e6).toFixed(2)} MH/s`;
   if (h >= 1e3) return `${(h / 1e3).toFixed(2)} KH/s`;
   return `${h.toFixed(0)} H/s`;
-}
-
-function formatTime(unix: number) {
-  if (!unix) return '—';
-  return new Date(unix * 1000).toLocaleString();
 }
 
 function timeAgo(unix: number) {
@@ -62,7 +58,7 @@ interface PayoutRow {
 export default function PoolPage() {
   const { data: poolData, isLoading } = useSWR('/api/pool', fetcher, { refreshInterval: 30000 });
   const { data: payoutsData } = useSWR('/api/payouts', fetcher, { refreshInterval: 60000 });
-  const { data: hashrateData } = useSWR('/api/hashrate?algo=scrypt&hours=24', fetcher, { refreshInterval: 60000 });
+  const { data: luckData } = useSWR('/api/luck?hours=24', fetcher, { refreshInterval: 120000 });
 
   const stats = poolData?.data || {};
   const coin: CoinData | undefined = Array.isArray(stats.coins) ? stats.coins[0] : undefined;
@@ -71,7 +67,6 @@ export default function PoolPage() {
   const totalBlocks = Array.isArray(stats.blockCount) && stats.blockCount[0] ? Number(stats.blockCount[0].total) : 0;
   const lastBlockTime = Array.isArray(stats.lastBlock) && stats.lastBlock[0] ? Number(stats.lastBlock[0].time) : 0;
   const payouts: PayoutRow[] = payoutsData?.data || [];
-  const hashrateHistory = hashrateData?.data || [];
 
   if (isLoading) {
     return (
@@ -93,7 +88,7 @@ export default function PoolPage() {
       </div>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         <div className="card">
           <div className="card-body text-center">
             <p className="stat-label">Pool Hashrate</p>
@@ -116,6 +111,25 @@ export default function PoolPage() {
           <div className="card-body text-center">
             <p className="stat-label">Last Block</p>
             <p className="stat-value text-lg">{timeAgo(lastBlockTime)}</p>
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-body text-center">
+            <p className="stat-label">Pool Luck (24h)</p>
+            {luckData?.data ? (
+              <>
+                <p className={`stat-value text-lg ${
+                  luckData.data.luck >= 100 ? 'text-green-400' : luckData.data.luck >= 50 ? 'text-yellow-400' : 'text-red-400'
+                }`}>
+                  {luckData.data.luck}%
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {luckData.data.found} found / {luckData.data.expected} expected
+                </p>
+              </>
+            ) : (
+              <p className="stat-value text-lg">--</p>
+            )}
           </div>
         </div>
       </div>
@@ -200,34 +214,9 @@ export default function PoolPage() {
         </div>
       </div>
 
-      {/* Hashrate History */}
-      <div className="card mb-8">
-        <div className="card-header">Hashrate History (24h)</div>
-        <div className="card-body">
-          {hashrateHistory.length > 0 ? (
-            <div className="h-48 flex items-end gap-px">
-              {hashrateHistory.map((point: { time: number; hashrate: number }, i: number) => {
-                const maxH = Math.max(...hashrateHistory.map((p: { hashrate: number }) => Number(p.hashrate)));
-                const pct = maxH > 0 ? (Number(point.hashrate) / maxH) * 100 : 0;
-                return (
-                  <div
-                    key={i}
-                    className="flex-1 bg-gradient-to-t from-[#c1440e] to-[#e77d11] rounded-t opacity-80 hover:opacity-100 transition-opacity relative group min-w-[2px]"
-                    style={{ height: `${Math.max(pct, 2)}%` }}
-                  >
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-[#1a1a2e] border border-[#2d3a5c] rounded px-2 py-1 text-xs whitespace-nowrap z-10">
-                      {formatHashrate(Number(point.hashrate))}
-                      <br />
-                      <span className="text-gray-500">{formatTime(point.time)}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center py-8">No hashrate data available for the last 24 hours</p>
-          )}
-        </div>
+      {/* Hashrate Chart */}
+      <div className="mb-8">
+        <HashrateChart algo="scrypt" />
       </div>
 
       {/* Recent Payouts */}

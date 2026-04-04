@@ -188,4 +188,42 @@ export async function getWalletBalance(wallet: string) {
   return balance;
 }
 
+// Pool luck: compare actual blocks found vs expected
+export async function getPoolLuck(hours = 24) {
+  // Get blocks found in period
+  const [blocksResult] = await pool.execute(`
+    SELECT COUNT(*) as found
+    FROM blocks
+    WHERE time > UNIX_TIMESTAMP() - ? * 3600
+  `, [hours]);
+  const found = (blocksResult as Array<{ found: number }>)[0]?.found || 0;
+
+  // Get average pool hashrate and network difficulty in period
+  const [statsResult] = await pool.execute(`
+    SELECT AVG(hashrate) as avg_hashrate
+    FROM hashstats
+    WHERE algo = 'scrypt'
+    AND time > UNIX_TIMESTAMP() - ? * 3600
+  `, [hours]);
+  const avgHashrate = (statsResult as Array<{ avg_hashrate: number }>)[0]?.avg_hashrate || 0;
+
+  // Get current network difficulty
+  const [coinResult] = await pool.execute(`
+    SELECT difficulty, block_time FROM coins WHERE symbol = 'MARS' AND enable = 1 LIMIT 1
+  `);
+  const coin = (coinResult as Array<{ difficulty: number; block_time: number }>)[0];
+  const netDiff = coin?.difficulty || 1;
+
+  // Expected blocks = (pool_hashrate / network_hashrate) * (seconds / block_time)
+  // For scrypt: network_hash ~= difficulty * 2^32 / block_time
+  const blockTime = coin?.block_time || 120; // default 2 min
+  const networkHashrate = (netDiff * Math.pow(2, 32)) / blockTime;
+  const poolShare = networkHashrate > 0 ? avgHashrate / networkHashrate : 0;
+  const expected = poolShare * (hours * 3600 / blockTime);
+
+  const luck = expected > 0 ? (found / expected) * 100 : 0;
+
+  return { found, expected: Math.round(expected * 100) / 100, luck: Math.round(luck), hours };
+}
+
 export default pool;

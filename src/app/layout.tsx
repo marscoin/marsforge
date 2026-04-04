@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
+import Navbar from "@/components/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -10,41 +10,6 @@ export const metadata: Metadata = {
   description: "Mine MARS to support the Martian Republic and Mars colonization efforts. Anonymous mining, automatic payouts, real-time statistics.",
   keywords: "marscoin, mining pool, cryptocurrency, scrypt, mars, blockchain",
 };
-
-function Navbar() {
-  return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1a1a2e]/95 backdrop-blur border-b border-[#2d3a5c]">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl">🔴</span>
-            <span className="text-xl font-bold bg-gradient-to-r from-[#e77d11] to-[#ff6b35] bg-clip-text text-transparent">
-              MarsForge
-            </span>
-          </Link>
-
-          <div className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-[#f4e3d7] hover:text-[#e77d11] transition">
-              Dashboard
-            </Link>
-            <Link href="/pool" className="text-[#f4e3d7] hover:text-[#e77d11] transition">
-              Pool Stats
-            </Link>
-            <Link href="/blocks" className="text-[#f4e3d7] hover:text-[#e77d11] transition">
-              Blocks
-            </Link>
-            <Link href="/miners" className="text-[#f4e3d7] hover:text-[#e77d11] transition">
-              Miners
-            </Link>
-            <Link href="/start" className="btn-primary text-sm">
-              Start Mining
-            </Link>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
-}
 
 function Footer() {
   return (

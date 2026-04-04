@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import useSWR from 'swr';
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 const miners = [
   {
@@ -57,6 +60,85 @@ function CopyButton({ text }: { text: string }) {
     >
       {copied ? 'Copied!' : 'Copy'}
     </button>
+  );
+}
+
+function EarningsCalculator() {
+  const [hashrate, setHashrate] = useState('100');
+  const [unit, setUnit] = useState('GH');
+  const { data: poolData } = useSWR('/api/pool', fetcher);
+
+  const stats = poolData?.data || {};
+  const coin = Array.isArray(stats.coins) ? stats.coins[0] : null;
+  const netDiff = coin?.difficulty || 1000000;
+  const reward = coin?.reward || 0.1953125;
+  const blockTime = coin?.block_time || 120;
+
+  // Convert input to H/s
+  const multipliers: Record<string, number> = { 'MH': 1e6, 'GH': 1e9, 'TH': 1e12 };
+  const hashrateHs = parseFloat(hashrate || '0') * (multipliers[unit] || 1e9);
+
+  // Network hashrate from difficulty: H/s = diff * 2^32 / block_time
+  const networkHashrate = (netDiff * Math.pow(2, 32)) / blockTime;
+  const poolShare = networkHashrate > 0 ? hashrateHs / networkHashrate : 0;
+
+  // Expected blocks per day
+  const blocksPerDay = (86400 / blockTime) * poolShare;
+  const dailyMars = blocksPerDay * reward;
+  const weeklyMars = dailyMars * 7;
+  const monthlyMars = dailyMars * 30;
+
+  return (
+    <div className="mt-12 card">
+      <div className="card-header">Earnings Calculator</div>
+      <div className="card-body">
+        <p className="text-sm text-gray-400 mb-4">
+          Estimate your daily earnings based on your hashrate. These are approximations assuming current network conditions.
+        </p>
+        <div className="flex gap-3 mb-6">
+          <input
+            type="number"
+            value={hashrate}
+            onChange={(e) => setHashrate(e.target.value)}
+            className="input flex-1 max-w-[200px]"
+            placeholder="Hashrate"
+            min="0"
+          />
+          <select
+            value={unit}
+            onChange={(e) => setUnit(e.target.value)}
+            className="input w-24"
+          >
+            <option value="MH">MH/s</option>
+            <option value="GH">GH/s</option>
+            <option value="TH">TH/s</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-[#1a1a2e] rounded-lg p-4 border border-[#2d3a5c] text-center">
+            <p className="text-gray-500 text-sm mb-1">Daily</p>
+            <p className="text-2xl font-bold text-[#e77d11]">{dailyMars.toFixed(4)}</p>
+            <p className="text-xs text-gray-500">MARS / day</p>
+          </div>
+          <div className="bg-[#1a1a2e] rounded-lg p-4 border border-[#2d3a5c] text-center">
+            <p className="text-gray-500 text-sm mb-1">Weekly</p>
+            <p className="text-2xl font-bold text-[#e77d11]">{weeklyMars.toFixed(4)}</p>
+            <p className="text-xs text-gray-500">MARS / week</p>
+          </div>
+          <div className="bg-[#1a1a2e] rounded-lg p-4 border border-[#2d3a5c] text-center">
+            <p className="text-gray-500 text-sm mb-1">Monthly</p>
+            <p className="text-2xl font-bold text-[#e77d11]">{monthlyMars.toFixed(4)}</p>
+            <p className="text-xs text-gray-500">MARS / month</p>
+          </div>
+        </div>
+
+        <div className="mt-4 text-xs text-gray-500 space-y-1">
+          <p>Network difficulty: {netDiff.toLocaleString()} | Block reward: {reward} MARS | Block time: ~{blockTime}s</p>
+          <p>Estimates assume constant difficulty and hashrate. Actual earnings may vary.</p>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -157,6 +239,9 @@ export default function StartPage() {
           </div>
         </StepCard>
       </div>
+
+      {/* Earnings Calculator */}
+      <EarningsCalculator />
 
       {/* Pool Details */}
       <div className="mt-12 card">
