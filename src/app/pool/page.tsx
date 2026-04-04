@@ -2,6 +2,7 @@
 
 import useSWR from 'swr';
 import HashrateChart from '@/components/HashrateChart';
+import NetworkChart from '@/components/NetworkChart';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -59,6 +60,7 @@ export default function PoolPage() {
   const { data: poolData, isLoading } = useSWR('/api/pool', fetcher, { refreshInterval: 30000 });
   const { data: payoutsData } = useSWR('/api/payouts', fetcher, { refreshInterval: 60000 });
   const { data: luckData } = useSWR('/api/luck?hours=24', fetcher, { refreshInterval: 120000 });
+  const { data: priceData } = useSWR('/api/price', fetcher, { refreshInterval: 300000 });
 
   const stats = poolData?.data || {};
   const coin: CoinData | undefined = Array.isArray(stats.coins) ? stats.coins[0] : undefined;
@@ -158,8 +160,18 @@ export default function PoolPage() {
                   <span className="text-[#e77d11]">{coin.reward} MARS</span>
                 </div>
                 <div className="flex justify-between border-b border-[#2d3a5c] pb-2">
-                  <span className="text-gray-400">Price (BTC)</span>
-                  <span className="text-[#f4e3d7]">{coin.price}</span>
+                  <span className="text-gray-400">Price (USD)</span>
+                  <span className="text-[#f4e3d7]">
+                    {priceData?.data?.data?.['154']?.quote?.USD?.price
+                      ? `$${priceData.data.data['154'].quote.USD.price.toFixed(4)}`
+                      : `${coin.price} BTC`}
+                    {priceData?.data?.data?.['154']?.quote?.USD?.percent_change_24h !== undefined && (
+                      <span className={`ml-2 text-xs ${priceData.data.data['154'].quote.USD.percent_change_24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {priceData.data.data['154'].quote.USD.percent_change_24h >= 0 ? '+' : ''}
+                        {priceData.data.data['154'].quote.USD.percent_change_24h.toFixed(2)}%
+                      </span>
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between border-b border-[#2d3a5c] pb-2">
                   <span className="text-gray-400">Node Connections</span>
@@ -214,9 +226,10 @@ export default function PoolPage() {
         </div>
       </div>
 
-      {/* Hashrate Chart */}
-      <div className="mb-8">
+      {/* Hashrate Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <HashrateChart algo="scrypt" />
+        <NetworkChart algo="scrypt" />
       </div>
 
       {/* Recent Payouts */}

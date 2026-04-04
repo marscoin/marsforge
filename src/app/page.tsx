@@ -160,13 +160,26 @@ export default function Home() {
   const { data: poolData } = useSWR('/api/pool', fetcher, {
     refreshInterval: 30000
   });
+  const { data: priceData } = useSWR('/api/price', fetcher, {
+    refreshInterval: 300000
+  });
+
+  // Price data
+  const priceInfo = priceData?.data?.data?.['154']?.quote?.USD;
+  const usdPrice = priceInfo?.price || 0;
+  const change24h = priceInfo?.percent_change_24h || 0;
 
   // Extract stats or use defaults
   const stats = poolData?.data || {};
-  const coin = Array.isArray(stats.coins) ? stats.coins[0] : {};
+  const coin = Array.isArray(stats.coins) ? stats.coins[0] : null;
   const hashrate = Array.isArray(stats.hashstats) && stats.hashstats[0] ? Number(stats.hashstats[0].hashrate) : 0;
   const workers = Array.isArray(stats.workers) && stats.workers[0] ? Number(stats.workers[0].count) : 0;
   const difficulty = coin?.difficulty || 0;
+  const blockTime = coin?.block_time || 120;
+
+  // Network hashrate = difficulty * 2^32 / block_time
+  const networkHashrate = difficulty > 0 ? (difficulty * Math.pow(2, 32)) / blockTime : 0;
+  const poolShare = networkHashrate > 0 ? (hashrate / networkHashrate) * 100 : 0;
 
   // Format hashrate
   const formatHashrate = (h: number) => {
@@ -192,11 +205,16 @@ export default function Home() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         <StatCard
           title="Pool Hashrate"
           value={formatHashrate(hashrate)}
-          subtitle="Combined mining power"
+          subtitle={poolShare > 0 ? `${poolShare.toFixed(2)}% of network` : 'Combined mining power'}
+        />
+        <StatCard
+          title="Network Hashrate"
+          value={formatHashrate(networkHashrate)}
+          subtitle="Estimated from difficulty"
         />
         <StatCard
           title="Active Workers"
@@ -204,15 +222,23 @@ export default function Home() {
           subtitle="Mining devices"
         />
         <StatCard
-          title="Network Difficulty"
+          title="Difficulty"
           value={difficulty ? `${(difficulty/1000).toFixed(1)}K` : '—'}
-          subtitle="Current difficulty"
+          subtitle="Network difficulty"
         />
         <StatCard
           title="Block Reward"
-          value="0.195 MARS"
+          value={coin?.reward ? `${coin.reward} MARS` : '0.195 MARS'}
           subtitle="Per block found"
         />
+        {usdPrice > 0 && (
+          <StatCard
+            title="MARS Price"
+            value={`$${usdPrice.toFixed(4)}`}
+            subtitle={`${change24h >= 0 ? '+' : ''}${change24h.toFixed(2)}% (24h)`}
+            trend={change24h >= 0 ? 'up' : 'down'}
+          />
+        )}
       </div>
 
       {/* Main Content Grid */}

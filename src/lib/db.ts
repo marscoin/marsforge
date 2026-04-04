@@ -188,6 +188,19 @@ export async function getWalletBalance(wallet: string) {
   return balance;
 }
 
+// Network hashrate history (derived from difficulty in hashrate table)
+export async function getNetworkHashrateHistory(algo: string, hours = 24) {
+  const [history] = await pool.execute(`
+    SELECT time, difficulty, hashrate as pool_hashrate
+    FROM hashrate
+    WHERE algo = ?
+    AND difficulty > 0
+    AND time > UNIX_TIMESTAMP() - ? * 3600
+    ORDER BY time ASC
+  `, [algo, hours]);
+  return history;
+}
+
 // Pool luck: compare actual blocks found vs expected
 export async function getPoolLuck(hours = 24) {
   // Get blocks found in period
