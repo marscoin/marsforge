@@ -101,7 +101,7 @@ function QuickStart() {
 
 // Recent blocks component
 function RecentBlocks() {
-  const { data, error, isLoading } = useSWR('/api/blocks?limit=5', fetcher, {
+  const { data, isLoading } = useSWR('/api/blocks?limit=5', fetcher, {
     refreshInterval: 30000
   });
 
@@ -112,12 +112,11 @@ function RecentBlocks() {
     </div>
   );
 
-  // Mock data for display if API not connected
-  const blocks = data?.data || [
-    { height: 3443974, time: Date.now()/1000, amount: 0.195, category: 'generate', symbol: 'MARS' },
-    { height: 3443973, time: Date.now()/1000 - 180, amount: 0.195, category: 'generate', symbol: 'MARS' },
-    { height: 3443972, time: Date.now()/1000 - 420, amount: 0.195, category: 'generate', symbol: 'MARS' },
-  ];
+  // Extract blocks array from API response
+  const rawData = data?.data;
+  const blocks = Array.isArray(rawData) ? rawData
+    : Array.isArray(rawData?.blocks) ? rawData.blocks
+    : [];
 
   return (
     <div className="card">
@@ -136,7 +135,7 @@ function RecentBlocks() {
             </tr>
           </thead>
           <tbody>
-            {blocks.map((block: any, i: number) => (
+            {blocks.map((block: { height?: number; time: number; amount: number; category?: string; symbol: string }, i: number) => (
               <tr key={i}>
                 <td className="font-mono">{block.height?.toLocaleString()}</td>
                 <td className="text-gray-400">
@@ -163,10 +162,11 @@ export default function Home() {
   });
 
   // Extract stats or use defaults
-  const coin = poolData?.data?.[0] || {};
-  const hashrate = coin.hashrate || 0;
-  const workers = coin.workers || 0;
-  const difficulty = coin.difficulty || 0;
+  const stats = poolData?.data || {};
+  const coin = Array.isArray(stats.coins) ? stats.coins[0] : {};
+  const hashrate = Array.isArray(stats.hashstats) && stats.hashstats[0] ? Number(stats.hashstats[0].hashrate) : 0;
+  const workers = Array.isArray(stats.workers) && stats.workers[0] ? Number(stats.workers[0].count) : 0;
+  const difficulty = coin?.difficulty || 0;
 
   // Format hashrate
   const formatHashrate = (h: number) => {
