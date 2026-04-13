@@ -13,6 +13,7 @@ export default function Navbar() {
     { href: '/pool', label: 'Pool Stats' },
     { href: '/blocks', label: 'Blocks' },
     { href: '/miners', label: 'Miners' },
+    { href: '/testnet', label: 'Testnet' },
   ];
 
   const isActive = (href: string) => {
