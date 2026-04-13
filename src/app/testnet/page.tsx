@@ -32,8 +32,8 @@ export default function TestnetPage() {
 
   const testnet: TestnetData | null = data?.success ? data.data : null;
 
-  // Pool stratum for marsqnet (not live yet - coming soon)
-  const stratumReady = false;
+  // Pool stratum for marsqnet
+  const stratumReady = true;
 
   if (isLoading) {
     return (
@@ -142,13 +142,13 @@ export default function TestnetPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* How to Mine */}
         <div className="card">
-          <div className="card-header text-purple-400">How to Mine (Coming Soon)</div>
+          <div className="card-header text-purple-400">How to Mine</div>
           <div className="card-body space-y-4">
             <p className="text-sm text-gray-400">
-              The marsqnet pool stratum is being built. Once live, you can mine with any CPU:
+              The marsqnet pool stratum is live! Mine with any CPU using xmrig:
             </p>
             <div>
-              <p className="text-xs text-gray-500 mb-1">XMRig command (planned)</p>
+              <p className="text-xs text-gray-500 mb-1">XMRig command</p>
               <code className="block bg-[#1a1a2e] p-3 rounded-lg text-purple-300 text-sm border border-[#2d3a5c]">
                 ./xmrig -a rx/0 -o stratum+tcp://mining-mars.com:3434 -u YOUR_MQTADDRESS.worker -p x
               </code>
