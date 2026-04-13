@@ -233,6 +233,28 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Testnet Announcement */}
+      <div className="card mb-8 border-purple-800/50 bg-gradient-to-r from-[#1e2746] to-[#1a1a2e]">
+        <div className="card-body flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 rounded-full bg-purple-400 animate-pulse flex-shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-purple-300">
+                Quantum Testnet Pool is Live!
+              </p>
+              <p className="text-xs text-gray-400">
+                Mine marsqnet with your CPU using RandomX. No ASICs needed.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <a href="/testnet" className="px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-900/50 text-purple-300 border border-purple-700 hover:bg-purple-800/50 transition whitespace-nowrap">
+              View Testnet
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Stats Grid - two rows of 4 */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <StatCard
