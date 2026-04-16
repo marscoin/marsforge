@@ -29,6 +29,7 @@ async function rpcCall(method: string, params: unknown[] = []) {
       method,
       params,
     }),
+    cache: 'no-store',
   });
 
   if (!res.ok) {
