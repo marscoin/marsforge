@@ -28,13 +28,25 @@ interface TestnetData {
   recentBlocks: { height: number; hash: string; time: number; txCount: number; size: number; difficulty: number }[];
 }
 
+interface StratumData {
+  up: boolean;
+  miners: number;
+  height: number;
+  shares: number;
+  blocks: number;
+  blocksRejected: number;
+  rejects: { lowDifficulty: number; stale: number; duplicate: number; badHash: number };
+}
+
 export default function TestnetPage() {
   const { data, isLoading } = useSWR('/api/testnet', fetcher, { refreshInterval: 10000 });
+  const { data: stratumResp } = useSWR('/api/testnet/stratum', fetcher, { refreshInterval: 5000 });
 
   const testnet: TestnetData | null = data?.success ? data.data : null;
+  const stratum: StratumData | null = stratumResp?.success ? stratumResp.data : null;
 
   // Pool stratum for marsqnet
-  const stratumReady = true;
+  const stratumReady = stratum?.up ?? false;
 
   if (isLoading) {
     return (
@@ -134,13 +146,54 @@ export default function TestnetPage() {
         <div className="card">
           <div className="card-body text-center">
             <p className="stat-label">Pool Stratum</p>
-            <p className="text-2xl font-bold text-yellow-400">
-              {stratumReady ? 'Online' : 'Soon'}
+            <p className={`text-2xl font-bold ${stratumReady ? 'text-green-400' : 'text-red-400'}`}>
+              {stratumReady ? 'Online' : 'Offline'}
             </p>
-            <p className="text-xs text-gray-500">{stratumReady ? 'Port 3434' : 'Building stratum...'}</p>
+            <p className="text-xs text-gray-500">Port 3434</p>
           </div>
         </div>
       </div>
+
+      {/* Pool Activity */}
+      {stratum && (
+        <div className="card mb-8 border-purple-800/50">
+          <div className="card-header text-purple-400 flex justify-between items-center">
+            <span>Pool Activity</span>
+            <span className="text-xs text-gray-500">updates every 5s</span>
+          </div>
+          <div className="card-body">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <p className="stat-label">Miners Online</p>
+                <p className="text-3xl font-bold text-purple-400">{stratum.miners}</p>
+                <p className="text-xs text-gray-500">connected</p>
+              </div>
+              <div className="text-center">
+                <p className="stat-label">Shares</p>
+                <p className="text-3xl font-bold text-purple-400">{stratum.shares.toLocaleString()}</p>
+                <p className="text-xs text-gray-500">submitted</p>
+              </div>
+              <div className="text-center">
+                <p className="stat-label">Blocks Found</p>
+                <p className={`text-3xl font-bold ${stratum.blocks > 0 ? 'text-green-400' : 'text-purple-400'}`}>
+                  {stratum.blocks}
+                </p>
+                <p className="text-xs text-gray-500">by this pool</p>
+              </div>
+              <div className="text-center">
+                <p className="stat-label">Template Height</p>
+                <p className="text-3xl font-bold text-purple-400">{stratum.height}</p>
+                <p className="text-xs text-gray-500">next block</p>
+              </div>
+            </div>
+            {stratum.blocks > 0 && (
+              <div className="mt-4 p-3 bg-green-900/20 border border-green-700/50 rounded-lg text-center">
+                <p className="text-green-400 font-semibold">&#x1F389; {stratum.blocks} block{stratum.blocks !== 1 ? 's' : ''} mined by this pool!</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* How to Mine */}
