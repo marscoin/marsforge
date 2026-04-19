@@ -24,6 +24,7 @@ interface TestnetData {
   mempool: { size: number; bytes: number };
   bestBlockHash: string;
   chainWork: string;
+  blockReward: number | null;
   recentBlocks: { height: number; hash: string; time: number; txCount: number; size: number; difficulty: number }[];
 }
 
@@ -54,8 +55,8 @@ export default function TestnetPage() {
     );
   }
 
-  // Estimate block time from difficulty
-  const blockReward = 50; // marsqnet coinbase value
+  // Block reward from live node (coinbasevalue), falls back to display "—"
+  const blockReward = testnet.blockReward;
   const networkHashrate = testnet.networkHashrate;
 
   return (
@@ -124,7 +125,9 @@ export default function TestnetPage() {
         <div className="card">
           <div className="card-body text-center">
             <p className="stat-label">Block Reward</p>
-            <p className="text-2xl font-bold text-purple-400">{blockReward} MARS</p>
+            <p className="text-2xl font-bold text-purple-400">
+              {blockReward !== null ? `${blockReward.toFixed(8).replace(/\.?0+$/, '')} MARS` : '—'}
+            </p>
             <p className="text-xs text-gray-500">Per block (testnet)</p>
           </div>
         </div>

@@ -45,11 +45,12 @@ async function rpcCall(method: string, params: unknown[] = []) {
 
 export async function GET() {
   try {
-    const [miningInfo, networkInfo, blockchainInfo, mempoolInfo] = await Promise.all([
+    const [miningInfo, networkInfo, blockchainInfo, mempoolInfo, blockTemplate] = await Promise.all([
       rpcCall('getmininginfo'),
       rpcCall('getnetworkinfo'),
       rpcCall('getblockchaininfo'),
       rpcCall('getmempoolinfo'),
+      rpcCall('getblocktemplate', [{ rules: ['segwit'] }]).catch(() => null),
     ]);
 
     // Get last few block details
@@ -89,6 +90,7 @@ export async function GET() {
         },
         bestBlockHash: blockchainInfo.bestblockhash,
         chainWork: blockchainInfo.chainwork,
+        blockReward: blockTemplate ? blockTemplate.coinbasevalue / 1e8 : null,
         recentBlocks,
       },
     });
