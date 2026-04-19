@@ -144,36 +144,53 @@ export default function TestnetPage() {
         <div className="card">
           <div className="card-header text-purple-400">How to Mine</div>
           <div className="card-body space-y-5">
-            {/* Step 1: Download */}
-            <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Step 1 &mdash; Download XMRig</p>
-              <p className="text-sm text-gray-400 mb-3">
-                The industry-standard RandomX miner. Works on any modern CPU.
+            {/* Upstream PR note */}
+            <div className="bg-purple-950/30 border border-purple-800/50 rounded-lg p-3 text-xs text-gray-300">
+              <p className="text-purple-300 font-semibold mb-1">
+                Patched xmrig required
               </p>
-              <div className="flex flex-wrap gap-2">
+              <p className="text-gray-400">
+                Marscoin uses Bitcoin-style 80-byte block headers with the nonce at offset 76.
+                Stock xmrig assumes CryptoNote format (nonce at offset 39), so you need our fork with the <code className="text-purple-300">rx/mars</code> algorithm added.
+                Upstream PR: <a href="https://github.com/xmrig/xmrig/pull/3803" target="_blank" rel="noreferrer" className="text-purple-400 hover:underline">xmrig/xmrig#3803</a>
+              </p>
+            </div>
+
+            {/* Step 1: Build */}
+            <div>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Step 1 &mdash; Build xmrig (marscoin fork)</p>
+              <p className="text-sm text-gray-400 mb-3">
+                Until upstream merges our patch, build from our fork. It&apos;s a normal xmrig build &mdash; just a different git remote.
+              </p>
+              <code className="block bg-[#1a1a2e] p-3 rounded-lg text-purple-300 text-xs border border-[#2d3a5c] overflow-x-auto whitespace-pre">
+{`git clone -b marscoin-rx https://github.com/marscoin/xmrig.git
+cd xmrig && mkdir build && cd build
+cmake .. && make -j$(nproc)`}
+              </code>
+              <div className="flex flex-wrap gap-2 mt-3">
                 <a
-                  href="https://github.com/xmrig/xmrig/releases"
+                  href="https://github.com/marscoin/xmrig/tree/marscoin-rx"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-medium hover:from-purple-500 hover:to-indigo-500 transition"
                 >
-                  Download XMRig &rarr;
+                  marscoin/xmrig &rarr;
                 </a>
                 <a
-                  href="https://xmrig.com/wizard"
+                  href="https://github.com/xmrig/xmrig/wiki/Build"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1a1a2e] border border-[#2d3a5c] text-purple-300 text-sm hover:bg-[#1e2746] transition"
                 >
-                  Config Wizard
+                  Build Guide
                 </a>
                 <a
-                  href="https://github.com/xmrig/xmrig"
+                  href="https://github.com/xmrig/xmrig/pull/3803"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1a1a2e] border border-[#2d3a5c] text-gray-400 text-sm hover:bg-[#1e2746] transition"
                 >
-                  Source
+                  Upstream PR
                 </a>
               </div>
             </div>
@@ -181,11 +198,8 @@ export default function TestnetPage() {
             {/* Step 2: Run */}
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Step 2 &mdash; Run the miner</p>
-              <p className="text-sm text-gray-400 mb-2">
-                From the xmrig folder, run:
-              </p>
               <code className="block bg-[#1a1a2e] p-3 rounded-lg text-purple-300 text-sm border border-[#2d3a5c] overflow-x-auto whitespace-nowrap">
-                ./xmrig -a rx/0 -o stratum+tcp://mining-mars.com:3434 -u WORKER_NAME -p x
+                ./xmrig -a rx/mars -o stratum+tcp://mining-mars.com:3434 -u WORKER_NAME -p x
               </code>
               <p className="text-xs text-gray-500 mt-2">
                 Replace <code className="text-purple-300">WORKER_NAME</code> with any identifier (e.g. <code>alice.laptop</code>). Addresses aren&apos;t required on testnet.
@@ -198,7 +212,7 @@ export default function TestnetPage() {
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Algorithm</span>
-                  <span className="text-purple-300 font-mono">rx/0</span>
+                  <span className="text-purple-300 font-mono">rx/mars</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Port</span>
@@ -209,8 +223,8 @@ export default function TestnetPage() {
                   <span className="text-purple-300 font-mono">1000</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Hardware</span>
-                  <span className="text-purple-300">Any CPU</span>
+                  <span className="text-gray-500">Nonce offset</span>
+                  <span className="text-purple-300 font-mono">76</span>
                 </div>
               </div>
             </div>
