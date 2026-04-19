@@ -143,32 +143,75 @@ export default function TestnetPage() {
         {/* How to Mine */}
         <div className="card">
           <div className="card-header text-purple-400">How to Mine</div>
-          <div className="card-body space-y-4">
-            <p className="text-sm text-gray-400">
-              The marsqnet pool stratum is live! Mine with any CPU using xmrig:
-            </p>
+          <div className="card-body space-y-5">
+            {/* Step 1: Download */}
             <div>
-              <p className="text-xs text-gray-500 mb-1">XMRig command</p>
-              <code className="block bg-[#1a1a2e] p-3 rounded-lg text-purple-300 text-sm border border-[#2d3a5c]">
-                ./xmrig -a rx/0 -o stratum+tcp://mining-mars.com:3434 -u YOUR_MQTADDRESS.worker -p x
-              </code>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Step 1 &mdash; Download XMRig</p>
+              <p className="text-sm text-gray-400 mb-3">
+                The industry-standard RandomX miner. Works on any modern CPU.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href="https://github.com/xmrig/xmrig/releases"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-medium hover:from-purple-500 hover:to-indigo-500 transition"
+                >
+                  Download XMRig &rarr;
+                </a>
+                <a
+                  href="https://xmrig.com/wizard"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1a1a2e] border border-[#2d3a5c] text-purple-300 text-sm hover:bg-[#1e2746] transition"
+                >
+                  Config Wizard
+                </a>
+                <a
+                  href="https://github.com/xmrig/xmrig"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1a1a2e] border border-[#2d3a5c] text-gray-400 text-sm hover:bg-[#1e2746] transition"
+                >
+                  Source
+                </a>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-500">Algorithm</span>
-                <span className="text-purple-300">RandomX</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Port</span>
-                <span className="text-purple-300">3434</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Hardware</span>
-                <span className="text-purple-300">Any CPU</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Address prefix</span>
-                <span className="text-purple-300 font-mono">mqt1...</span>
+
+            {/* Step 2: Run */}
+            <div>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Step 2 &mdash; Run the miner</p>
+              <p className="text-sm text-gray-400 mb-2">
+                From the xmrig folder, run:
+              </p>
+              <code className="block bg-[#1a1a2e] p-3 rounded-lg text-purple-300 text-sm border border-[#2d3a5c] overflow-x-auto whitespace-nowrap">
+                ./xmrig -a rx/0 -o stratum+tcp://mining-mars.com:3434 -u WORKER_NAME -p x
+              </code>
+              <p className="text-xs text-gray-500 mt-2">
+                Replace <code className="text-purple-300">WORKER_NAME</code> with any identifier (e.g. <code>alice.laptop</code>). Addresses aren&apos;t required on testnet.
+              </p>
+            </div>
+
+            {/* Pool specs */}
+            <div className="border-t border-[#2d3a5c] pt-4">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Pool Specs</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Algorithm</span>
+                  <span className="text-purple-300 font-mono">rx/0</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Port</span>
+                  <span className="text-purple-300 font-mono">3434</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Share diff</span>
+                  <span className="text-purple-300 font-mono">1000</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Hardware</span>
+                  <span className="text-purple-300">Any CPU</span>
+                </div>
               </div>
             </div>
           </div>
